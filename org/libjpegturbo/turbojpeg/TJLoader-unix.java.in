@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2011-2013 D. R. Commander.  All Rights Reserved.
+ * Copyright (C)2011-2013, 2016 D. R. Commander.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,19 +36,19 @@ final class TJLoader {
       String os = System.getProperty("os.name").toLowerCase();
       if (os.indexOf("mac") >= 0) {
         try {
-          System.load("%{__libdir}/libturbojpeg.jnilib");
+          System.load("@LIBDIR@/libturbojpeg.jnilib");
         } catch (java.lang.UnsatisfiedLinkError e2) {
           System.load("/usr/lib/libturbojpeg.jnilib");
         }
       } else {
         try {
-          System.load("%{__libdir}/libturbojpeg.so");
+          System.load("@LIBDIR@/libturbojpeg.so");
         } catch (java.lang.UnsatisfiedLinkError e3) {
-          String libdir = "%{__libdir}";
-          if (libdir.equals("/opt/libjpeg-turbo/lib64")) {
-            System.load("/opt/libjpeg-turbo/lib32/libturbojpeg.so");
-          } else if (libdir.equals("/opt/libjpeg-turbo/lib32")) {
-            System.load("/opt/libjpeg-turbo/lib64/libturbojpeg.so");
+          String libdir = "@LIBDIR@";
+          if (libdir.equals("@DEFAULT_CMAKE_INSTALL_PREFIX@/lib64")) {
+            System.load("@DEFAULT_CMAKE_INSTALL_PREFIX@/lib32/libturbojpeg.so");
+          } else if (libdir.equals("@DEFAULT_CMAKE_INSTALL_PREFIX@/lib32")) {
+            System.load("@DEFAULT_CMAKE_INSTALL_PREFIX@/lib64/libturbojpeg.so");
           } else {
             throw e3;
           }
