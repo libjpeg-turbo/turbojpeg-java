@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2013, 2016, 2020, 2026 D. R. Commander
+ * Copyright (C) 2011, 2026 D. R. Commander
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,29 +28,33 @@
 
 package org.libjpegturbo.turbojpeg;
 
+import org.scijava.util.ClassUtils;
+import org.scijava.util.FileUtils;
+import java.net.URL;
+
 final class TJLoader {
   static void load() {
     try {
-      System.loadLibrary("turbojpeg");
+      System.loadLibrary("turbojpeg-jni");
     } catch (java.lang.UnsatisfiedLinkError e) {
-      try {
-        System.load("@CMAKE_INSTALL_FULL_LIBDIR@/" +
-                    System.mapLibraryName("turbojpeg"));
-      } catch (java.lang.UnsatisfiedLinkError e2) {
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.indexOf("mac") < 0) {
-          String libdir = "@CMAKE_INSTALL_FULL_LIBDIR@";
-          if (libdir.equals("@CMAKE_INSTALL_DEFAULT_PREFIX@/lib64")) {
-            System.load("@CMAKE_INSTALL_DEFAULT_PREFIX@/lib32/" +
-                        System.mapLibraryName("turbojpeg"));
-          } else if (libdir.equals("@CMAKE_INSTALL_DEFAULT_PREFIX@/lib32")) {
-            System.load("@CMAKE_INSTALL_DEFAULT_PREFIX@/lib64/" +
-                        System.mapLibraryName("turbojpeg"));
-          } else {
-            throw e2;
-          }
+      Class cls = new TJLoader().getClass();
+      String clsName = cls.getName().replace('.', '/');
+      URL clsURL = cls.getResource("/" + clsName + ".class");
+
+      if (clsURL != null) {
+        String clsProtocol = clsURL.getProtocol();
+
+        if (clsProtocol.equals("jar") || clsProtocol.equals("rsrc")) {
+          URL jarURL = ClassUtils.getLocation(new TJLoader().getClass());
+          String jarDir =
+            FileUtils.urlToFile(jarURL).getParentFile().getAbsolutePath();
+
+          System.load(jarDir + java.io.File.separator +
+                      System.mapLibraryName("turbojpeg-jni"));
+          return;
         }
       }
+      throw e;
     }
   }
 }

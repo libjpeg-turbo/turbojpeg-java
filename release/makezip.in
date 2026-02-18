@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -u
+set -e
+trap onexit INT
+trap onexit TERM
+trap onexit EXIT
+
+TMPDIR=
+SUDO=
+
+onexit()
+{
+	if [ ! "$TMPDIR" = "" ]; then
+		rm -rf $TMPDIR
+	fi
+}
+
+uid()
+{
+	id | cut -f2 -d = | cut -f1 -d \(;
+}
+
+PKGNAME=@CMAKE_PROJECT_NAME@
+VERSION=@VERSION@
+ARCH=@PKGARCH@
+OS=@PKGOS@
+PREFIX=@CMAKE_INSTALL_PREFIX@
+
+umask 022
+rm -f $PKGNAME-$VERSION-$OS-$ARCH.zip
+TMPDIR=`mktemp -d /tmp/$PKGNAME-build.XXXXXX`
+mkdir -p $TMPDIR/install
+
+DESTDIR=$TMPDIR/install @CMAKE_MAKE_PROGRAM@ install
+
+__PWD=`pwd`
+echo $__PWD
+pushd $TMPDIR/install >/dev/null 2>&1
+zip -r $__PWD/$PKGNAME-$VERSION-$OS-$ARCH.zip *
+popd >/dev/null 2>&1
+
+exit

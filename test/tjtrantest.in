@@ -15,35 +15,25 @@ onexit()
 
 runme()
 {
-	echo \*\*\* $* | sed "s@$EXEDIR@\$EXEDIR@g" | sed "s@$IMGDIR@\$IMGDIR@g" |
-		sed "s@$JAVA@\$JAVA@g" | sed "s@$OUTDIR@\$OUTDIR@g"
+	echo \*\*\* $* | sed "s@$EXEDIR@\$EXEDIR@g" | sed "s@$LJTEXEDIR@\$EXEDIR@g" |
+		sed "s@$IMGDIR@\$IMGDIR@g" | sed "s@$JAVA@\$JAVA@g" |
+		sed "s@$OUTDIR@\$OUTDIR@g"
 	"$@"
 }
 
 IMGDIR=@CMAKE_SOURCE_DIR@/testimages
 OUTDIR=`mktemp -d /tmp/__tjtrantest_output.XXXXXX`
 EXEDIR=@CMAKE_BINARY_DIR@
+LJTEXEDIR=@libjpeg-turbo_DIR@/../../../bin
 JAVA="@Java_JAVA_EXECUTABLE@"
-JAVAARGS="-cp $EXEDIR/java/turbojpeg.jar -Djava.library.path=$EXEDIR"
-TJTRAN=$EXEDIR/tjtran
-JAVAARG=
+TJTRAN="$JAVA -cp $EXEDIR/turbojpeg.jar TJTran"
 
 if [ -d $OUTDIR ]; then
 	rm -rf $OUTDIR
 fi
 mkdir -p $OUTDIR
 
-while [ $# -gt 0 ]; do
-	case "$1" in
-	-java)
-		JAVAARG=-java
-		TJTRAN="$JAVA $JAVAARGS TJTran"
-		;;
-	esac
-	shift
-done
-
-exec >$EXEDIR/test/tjtrantest$JAVAARG.log
+exec >$EXEDIR/test/tjtrantest.log
 
 echo "EXEDIR: $EXEDIR"
 echo "IMGDIR: $IMGDIR"
@@ -55,8 +45,8 @@ SAMPOPT=(1x1 2x1 1x2 2x2 4x1 1x4 4x2)
 
 for precision in 8 12; do
 	if [ $precision -le 8 ]; then
-		RGBIMG=$IMGDIR/testorig.ppm
-		GRAYIMG=$IMGDIR/testorig.pgm
+		RGBIMG=$IMGDIR/fireball_lily8.ppm
+		GRAYIMG=$IMGDIR/fireball_lily8.pgm
 	else
 		RGBIMG=$IMGDIR/monkey16.ppm
 		GRAYIMG=$IMGDIR/monkey16.pgm
@@ -73,17 +63,17 @@ for precision in 8 12; do
 		elif [ $sampi = 5 ]; then
 			EXTRA_ARGS="-r 1"
 		fi
-		runme $EXEDIR/cjpeg -pre $precision -sa ${SAMPOPT[$sampi]} $EXTRA_ARGS \
+		runme $LJTEXEDIR/cjpeg -pre $precision -sa ${SAMPOPT[$sampi]} $EXTRA_ARGS \
 			-outf $OUTDIR/`basename $RGBIMG .ppm`-${SUBSAMPOPT[$sampi]}.jpg $RGBIMG
 		if [[ $sampi = 3 || $sampi = 4 ]]; then
-			$EXEDIR/wrjpgcom -comment "This is a test" \
+			$LJTEXEDIR/wrjpgcom -comment "This is a test" \
 				$OUTDIR/`basename $RGBIMG .ppm`-${SUBSAMPOPT[$sampi]}.jpg \
 				>$OUTDIR/temp.jpg
 			mv $OUTDIR/temp.jpg \
 				$OUTDIR/`basename $RGBIMG .ppm`-${SUBSAMPOPT[$sampi]}.jpg
 		fi
 	done
-	runme $EXEDIR/cjpeg -pre $precision \
+	runme $LJTEXEDIR/cjpeg -pre $precision \
 		-outf $OUTDIR/`basename $GRAYIMG .pgm`-gray.jpg $GRAYIMG
 	echo
 
@@ -144,7 +134,7 @@ for precision in 8 12; do
 												$grayarg $optarg $progarg $restartarg $trimarg \
 												$OUTDIR/${basename}-$subsamp.jpg \
 												$OUTDIR/${basename}-tjtran.jpg
-											runme $EXEDIR/jpegtran $ariarg $copyarg $croparg \
+											runme $LJTEXEDIR/jpegtran $ariarg $copyarg $croparg \
 												$xformarg $grayarg $optarg $progarg $restartarg \
 												$trimarg -outf $OUTDIR/${basename}-jpegtran.jpg \
 												$OUTDIR/${basename}-$subsamp.jpg

@@ -15,35 +15,25 @@ onexit()
 
 runme()
 {
-	echo \*\*\* $* | sed "s@$EXEDIR@\$EXEDIR@g" | sed "s@$IMGDIR@\$IMGDIR@g" |
-		sed "s@$JAVA@\$JAVA@g" | sed "s@$OUTDIR@\$OUTDIR@g"
+	echo \*\*\* $* | sed "s@$EXEDIR@\$EXEDIR@g" | sed "s@$LJTEXEDIR@\$EXEDIR@g" |
+		sed "s@$IMGDIR@\$IMGDIR@g" | sed "s@$JAVA@\$JAVA@g" |
+		sed "s@$OUTDIR@\$OUTDIR@g"
 	"$@"
 }
 
 IMGDIR=@CMAKE_SOURCE_DIR@/testimages
 OUTDIR=`mktemp -d /tmp/__tjdecomptest_output.XXXXXX`
 EXEDIR=@CMAKE_BINARY_DIR@
+LJTEXEDIR=@libjpeg-turbo_DIR@/../../../bin
 JAVA="@Java_JAVA_EXECUTABLE@"
-JAVAARGS="-cp $EXEDIR/java/turbojpeg.jar -Djava.library.path=$EXEDIR"
-TJDECOMP=$EXEDIR/tjdecomp
-JAVAARG=
+TJDECOMP="$JAVA -cp $EXEDIR/turbojpeg.jar TJDecomp"
 
 if [ -d $OUTDIR ]; then
 	rm -rf $OUTDIR
 fi
 mkdir -p $OUTDIR
 
-while [ $# -gt 0 ]; do
-	case "$1" in
-	-java)
-		JAVAARG=-java
-		TJDECOMP="$JAVA $JAVAARGS TJDecomp"
-		;;
-	esac
-	shift
-done
-
-exec >$EXEDIR/test/tjdecomptest$JAVAARG.log
+exec >$EXEDIR/test/tjdecomptest.log
 
 echo "EXEDIR: $EXEDIR"
 echo "IMGDIR: $IMGDIR"
@@ -55,8 +45,8 @@ SAMPOPT=(1x1 2x1 1x2 2x2 4x1 1x4 4x2)
 
 for precision in 8 12; do
 	if [ $precision -le 8 ]; then
-		RGBIMG=$IMGDIR/testorig.ppm
-		GRAYIMG=$IMGDIR/testorig.pgm
+		RGBIMG=$IMGDIR/fireball_lily8.ppm
+		GRAYIMG=$IMGDIR/fireball_lily8.pgm
 	else
 		RGBIMG=$IMGDIR/monkey16.ppm
 		GRAYIMG=$IMGDIR/monkey16.pgm
@@ -67,10 +57,10 @@ for precision in 8 12; do
 		if [ $sampi = 3 ]; then
 			iccarg="-icc $IMGDIR/test1.icc"
 		fi
-		runme $EXEDIR/cjpeg -pre $precision -sa ${SAMPOPT[$sampi]} $iccarg \
+		runme $LJTEXEDIR/cjpeg -pre $precision -sa ${SAMPOPT[$sampi]} $iccarg \
 			-outf $OUTDIR/`basename $RGBIMG .ppm`-${SUBSAMPOPT[$sampi]}.jpg $RGBIMG
 	done
-	runme $EXEDIR/cjpeg -pre $precision \
+	runme $LJTEXEDIR/cjpeg -pre $precision \
 		-outf $OUTDIR/`basename $GRAYIMG .pgm`-gray.jpg $GRAYIMG
 	echo
 
@@ -104,7 +94,7 @@ for precision in 8 12; do
 							runme $TJDECOMP $croparg $dctarg $nsarg $scalearg \
 								$OUTDIR/${basename}-$subsamp.jpg \
 								$OUTDIR/${basename}-tjdecomp.pgm
-							runme $EXEDIR/djpeg $croparg $dctarg $nsarg $scalearg \
+							runme $LJTEXEDIR/djpeg $croparg $dctarg $nsarg $scalearg \
 								-outf $OUTDIR/${basename}-djpeg.pgm \
 								$OUTDIR/${basename}-$subsamp.jpg
 							$EXEDIR/test/md5sum $OUTDIR/${basename}-tjdecomp.pgm \
@@ -117,7 +107,7 @@ for precision in 8 12; do
 							runme $TJDECOMP $croparg $dctarg $nsarg $scalearg \
 								-r $OUTDIR/${basename}-$subsamp.jpg \
 								$OUTDIR/${basename}-tjdecomp.ppm
-							runme $EXEDIR/djpeg $croparg $dctarg $nsarg $scalearg \
+							runme $LJTEXEDIR/djpeg $croparg $dctarg $nsarg $scalearg \
 								-rg -outf $OUTDIR/${basename}-djpeg.ppm \
 								$OUTDIR/${basename}-$subsamp.jpg
 							$EXEDIR/test/md5sum $OUTDIR/${basename}-tjdecomp.ppm \
@@ -138,8 +128,8 @@ for precision in 8 12; do
 							if [ "$subsamp" = "420" ]; then
 								iccarg="-icc $OUTDIR/${basename}-djpeg.icc"
 							fi
-							runme $EXEDIR/djpeg $croparg $dctarg $nsarg $scalearg $iccarg \
-								-outf $OUTDIR/${basename}-djpeg.ppm \
+							runme $LJTEXEDIR/djpeg $croparg $dctarg $nsarg $scalearg \
+								$iccarg -outf $OUTDIR/${basename}-djpeg.ppm \
 								$OUTDIR/${basename}-$subsamp.jpg
 							if [ "$subsamp" = "420" ]; then
 								$EXEDIR/test/md5sum $OUTDIR/${basename}-tjdecomp.icc \
@@ -159,7 +149,7 @@ for precision in 8 12; do
 								runme $TJDECOMP $croparg $dctarg $nsarg $scalearg \
 									-g $OUTDIR/${basename}-$subsamp.jpg \
 									$OUTDIR/${basename}-tjdecomp.pgm
-								runme $EXEDIR/djpeg $croparg $dctarg $nsarg $scalearg \
+								runme $LJTEXEDIR/djpeg $croparg $dctarg $nsarg $scalearg \
 									-gr -outf $OUTDIR/${basename}-djpeg.pgm \
 									$OUTDIR/${basename}-$subsamp.jpg
 								$EXEDIR/test/md5sum $OUTDIR/${basename}-tjdecomp.pgm \
@@ -181,21 +171,21 @@ done
 
 for precision in {2..16}; do
 	if [ $precision -le 8 ]; then
-		RGBIMG=$IMGDIR/testorig.ppm
-		GRAYIMG=$IMGDIR/testorig.pgm
+		RGBIMG=$IMGDIR/fireball_lily8.ppm
+		GRAYIMG=$IMGDIR/fireball_lily8.pgm
 	else
 		RGBIMG=$IMGDIR/monkey16.ppm
 		GRAYIMG=$IMGDIR/monkey16.pgm
 	fi
 
 	basename=`basename $RGBIMG .ppm`
-	runme $EXEDIR/cjpeg -pre $precision -l 1 \
+	runme $LJTEXEDIR/cjpeg -pre $precision -l 1 \
 		-outf $OUTDIR/${basename}-rgb.jpg $RGBIMG
 	echo
 
 	runme $TJDECOMP $OUTDIR/${basename}-rgb.jpg \
 		$OUTDIR/${basename}-tjdecomp.ppm
-	runme $EXEDIR/djpeg -outf $OUTDIR/${basename}-djpeg.ppm \
+	runme $LJTEXEDIR/djpeg -outf $OUTDIR/${basename}-djpeg.ppm \
 		$OUTDIR/${basename}-rgb.jpg
 	$EXEDIR/test/md5sum $OUTDIR/${basename}-tjdecomp.ppm \
 		$OUTDIR/${basename}-djpeg.ppm | sed "s@$OUTDIR@\$OUTDIR@g"
@@ -205,13 +195,13 @@ for precision in {2..16}; do
 	echo
 
 	basename=`basename $GRAYIMG .pgm`
-	runme $EXEDIR/cjpeg -pre $precision -l 1 \
+	runme $LJTEXEDIR/cjpeg -pre $precision -l 1 \
 		-outf $OUTDIR/${basename}-gray.jpg $GRAYIMG
 	echo
 
 	runme $TJDECOMP $OUTDIR/${basename}-gray.jpg \
 		$OUTDIR/${basename}-tjdecomp.pgm
-	runme $EXEDIR/djpeg -outf $OUTDIR/${basename}-djpeg.pgm \
+	runme $LJTEXEDIR/djpeg -outf $OUTDIR/${basename}-djpeg.pgm \
 		$OUTDIR/${basename}-gray.jpg
 	$EXEDIR/test/md5sum $OUTDIR/${basename}-tjdecomp.pgm \
 		$OUTDIR/${basename}-djpeg.pgm | sed "s@$OUTDIR@\$OUTDIR@g"
