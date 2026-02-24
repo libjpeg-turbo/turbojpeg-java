@@ -214,12 +214,6 @@ macro(report_option var desc)
   endif()
 endmacro()
 
-option(WITH_STATIC_TURBOJPEG
-  "Link the TurboJPEG JNI library with the static TurboJPEG API library rather than the shared TurboJPEG API library"
-  FALSE)
-boolean_number(WITH_STATIC_TURBOJPEG)
-report_option(WITH_STATIC_TURBOJPEG "Static TurboJPEG API library linkage")
-
 
 ###############################################################################
 # COMPILER SETTINGS
