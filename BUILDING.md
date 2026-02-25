@@ -10,7 +10,7 @@ Build Requirements
 
 - [CMake](https://cmake.org) v2.8.12 or later
 
-- JDK or OpenJDK 1.5 or later
+- JDK or OpenJDK 7 or later
 
   * Most modern Linux distributions, as well as Solaris 10 and later, include
     JDK or OpenJDK.  For other systems, pre-built JDK binaries can be obtained
