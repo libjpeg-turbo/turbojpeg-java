@@ -157,7 +157,7 @@ final class TJBench {
   }
 
 
-  /* Decompression test */
+  // Decompression test
   static void decomp(byte[][] jpegBufs, int[] jpegSizes, Object dstBuf, int w,
                      int h, int subsamp, int jpegQual, String fileName,
                      int tilew, int tileh) throws Exception {
@@ -208,8 +208,8 @@ final class TJBench {
           dstBuf = new short[pitch * scaledh];
       }
 
-      /* Set the destination buffer to gray so we know whether the decompressor
-         attempted to write to it */
+      // Set the destination buffer to gray so we know whether the decompressor
+      // attempted to write to it
       if (precision <= 8)
         Arrays.fill((byte[])dstBuf, (byte)127);
       else if (precision <= 12)
@@ -225,7 +225,7 @@ final class TJBench {
         Arrays.fill(yuvImage.getBuf(), (byte)127);
       }
 
-      /* Benchmark */
+      // Benchmark
       iter = -1;
       elapsed = elapsedDecode = 0.0;
       while (true) {
@@ -383,7 +383,7 @@ final class TJBench {
         new byte[ntilesw * ntilesh][TJ.bufSize(tilew, tileh, subsamp)];
       jpegSizes = new int[ntilesw * ntilesh];
 
-      /* Compression test */
+      // Compression test
       if (quiet == 1)
         System.out.format("%-4s(%s)  %-2d/%-6s %-3d   ", pfStr,
                           bottomUp ? "BU" : "TD", precision,
@@ -404,7 +404,7 @@ final class TJBench {
         Arrays.fill(yuvImage.getBuf(), (byte)127);
       }
 
-      /* Benchmark */
+      // Benchmark
       iter = -1;
       elapsed = elapsedEncode = 0.0;
       while (true) {
@@ -511,7 +511,7 @@ final class TJBench {
           System.out.println("Reference image written to " + tempStr);
       }
 
-      /* Decompression test */
+      // Decompression test
       if (!compOnly)
         decomp(jpegBufs, jpegSizes, tmpBuf, w, h, subsamp, jpegQual, fileName,
                tilew, tileh);
