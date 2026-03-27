@@ -12,11 +12,6 @@ option(TURBOJPEG_STATIC
   "Link with the static TurboJPEG API library rather than the shared TurboJPEG API library"
   FALSE)
 
-if(TJPEG_INCLUDE_DIR OR TJPEG_LIBRARY)
-  message(WARNING
-    "The build system now uses the CMake package config file in libjpeg-turbo v2.1 or later to find the TurboJPEG API library and header.  This can be customized with the TURBOJPEG_VERSION, TURBOJPEG_EXACT, TURBOJPEG_PATH, and TURBOJPEG_STATIC CMake variables.  TJPEG_INCLUDE_DIR and TJPEG_LIBRARY are ignored.")
-endif()
-
 set(EXACT "")
 if(TURBOJPEG_EXACT AND TURBOJPEG_VERSION)
   set(EXACT EXACT)
