@@ -10,7 +10,7 @@ if(CMAKE_C_FLAGS_RELWITHDEBINFO)
 endif()
 
 project(turbojpeg-java C)
-set(VERSION 3.1.80)
+set(VERSION 3.1.90)
 set(MSVC_LIKE 0)
 if(MSVC OR CMAKE_C_SIMULATE_ID STREQUAL "MSVC")
   set(MSVC_LIKE 1)
