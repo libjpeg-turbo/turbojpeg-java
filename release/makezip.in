@@ -35,7 +35,6 @@ mkdir -p $TMPDIR/install
 DESTDIR=$TMPDIR/install @CMAKE_MAKE_PROGRAM@ install
 
 __PWD=`pwd`
-echo $__PWD
 pushd $TMPDIR/install >/dev/null 2>&1
 zip -r $__PWD/$PKGNAME-$VERSION-$OS-$ARCH.zip *
 popd >/dev/null 2>&1
