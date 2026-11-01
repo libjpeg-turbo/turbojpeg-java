@@ -43,7 +43,7 @@ jobs:
           echo "GPG_KEY_PASS=${{secrets.GPG_KEY_PASS}}" >>$HOME/src/buildscripts/gpgsign
       - name: Build
         run: |
-          docker run -v $HOME/src/tjj.nightly:/root/src/tjj.nightly -v $HOME/src/buildscripts:/root/src/buildscripts -v $GITHUB_WORKSPACE:/root/src/turbojpeg-java -v $HOME/.gnupg:/root/.gnupg -v $HOME/libjpeg-turbo-rpm:/rpms -v $HOME/rpmkeys:/rpmkeys -t dcommander/buildljt:$BRANCH bash -c "rpm --import /rpmkeys/LJT-GPG-KEY && rpm -K /rpms/*.rpm && rpm -i /rpms/*86*.rpm && mkdir /opt/arm64 && pushd /opt/arm64 && rpm2cpio /rpms/*aarch64*.rpm | cpio -id && popd && ~/src/buildscripts/buildtjj -d /root/src/turbojpeg-java -v"
+          docker run --security-opt seccomp=unconfined -v $HOME/src/tjj.nightly:/root/src/tjj.nightly -v $HOME/src/buildscripts:/root/src/buildscripts -v $GITHUB_WORKSPACE:/root/src/turbojpeg-java -v $HOME/.gnupg:/root/.gnupg -v $HOME/libjpeg-turbo-rpm:/rpms -v $HOME/rpmkeys:/rpmkeys -t dcommander/buildljt:$BRANCH bash -c "rpm --import /rpmkeys/LJT-GPG-KEY && rpm -K /rpms/*.rpm && rpm -i /rpms/*86*.rpm && mkdir /opt/arm64 && pushd /opt/arm64 && rpm2cpio /rpms/*aarch64*.rpm | cpio -id && popd && ~/src/buildscripts/buildtjj -d /root/src/turbojpeg-java -v"
           sudo chown -R runner:runner $HOME/src/tjj.nightly
           mv $HOME/src/tjj.nightly/latest/log-${{github.job}}.txt $HOME/src/tjj.nightly/latest/files/
       - name: Configure AWS
