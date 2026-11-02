@@ -1,3 +1,11 @@
+3.2.1
+=====
+
+1. Fixed a buffer overrun in TJBench that occurred when testing both
+compression and decompression with a decompression scaling factor greater
+than 1.
+
+
 3.2.0
 =====
 
