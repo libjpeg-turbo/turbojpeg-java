@@ -1,5 +1,5 @@
-3.1.90 (3.2 beta1)
-==================
+3.2.0
+=====
 
 ### Significant changes relative to 3.1.4
 
