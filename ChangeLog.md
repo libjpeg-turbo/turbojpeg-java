@@ -1,9 +1,14 @@
 3.2.1
 =====
 
+### Significant changes relative to 3.2.0
+
 1. Fixed a buffer overrun in TJBench that occurred when testing both
 compression and decompression with a decompression scaling factor greater
 than 1.
+
+2. Fixed an issue whereby TJBench incorrectly calculated lossless
+transformation performance
 
 
 3.2.0
